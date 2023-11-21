@@ -126,9 +126,26 @@ void PrettyPrinter::print_measurements(const Profiler::MeasurementsMap &measurem
 {
     for(const auto &instrument : measurements)
     {
-        *_stream << begin_color("3") << "  " << instrument.first << ":";
-
         InstrumentsStats stats(instrument.second);
+
+        // Print logs for AIBench
+        std::string measurement_name = instrument.first;
+        if (measurement_name.find("Wall clock") != std::string::npos) {
+            measurement_name = "NET";
+        }
+        for (auto &measurement : instrument.second) {
+            std::stringstream buffer;
+            buffer << "PyTorchObserver {\"type\": \""
+                   << measurement_name << "\", "
+                   << "\"unit\": \"" << stats.median().unit() << "\", "
+                   << "\"metric\": \"latency\", "
+                   << "\"value\": \"" << measurement.value() << "\""
+                   << "}\n";
+            std::cout << buffer.str();
+        }
+
+        // Print summary
+        *_stream << begin_color("3") << "  " << instrument.first << ":";
 
         *_stream << "    ";
         *_stream << "AVG=" << stats.mean() << " " << stats.max().unit();

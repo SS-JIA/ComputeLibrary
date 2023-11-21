@@ -60,6 +60,7 @@ struct FrameworkConfig
     std::string                                    name_filter{};               /**< Regular expression to filter tests by name. Only matching tests will be executed. */
     std::string                                    id_filter{};                 /**< String to match selected test ids. Only matching tests will be executed. */
     DatasetMode                                    mode{ DatasetMode::ALL };    /**< Dataset mode. */
+    int                                            num_warmup{ 1 };  /**< Number of warmup iterations per test. */
     int                                            num_iterations{ 1 };         /**< Number of iterations per test. */
     float                                          cooldown_sec{ -1.f };        /**< Delay between tests in seconds. */
     LogLevel                                       log_level{ LogLevel::NONE }; /**< Verbosity of the output. */
@@ -204,11 +205,23 @@ public:
      */
     void log_info(const std::string &info);
 
+    /** Number of warmup iterations per test case.
+     *
+     * @return Number of warmup iterations per test case.
+     */
+    int num_warmup() const;
+
     /** Number of iterations per test case.
      *
      * @return Number of iterations per test case.
      */
     int num_iterations() const;
+
+    /** Set number of warmup iterations per test case.
+     *
+     * @param[in] num_warmup Number of warmup iterations per test case.
+     */
+    void set_num_warmup(int num_warmup);
 
     /** Set number of iterations per test case.
      *
@@ -350,6 +363,7 @@ private:
     std::vector<std::string>                      _test_suite_name{};
     std::vector<std::unique_ptr<TestCaseFactory>> _test_factories{};
     std::map<TestInfo, TestResult> _test_results{};
+    int                    _num_warmup{ 1 };
     int                    _num_iterations{ 1 };
     float                  _cooldown_sec{ -1.f };
     bool                   _throw_errors{ false };

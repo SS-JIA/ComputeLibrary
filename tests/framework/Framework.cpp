@@ -130,6 +130,7 @@ Framework &Framework::get()
 void Framework::init(const FrameworkConfig &config)
 {
     _test_filter.reset(new TestFilter(config.mode, config.name_filter, config.id_filter));
+    _num_warmup      = config.num_warmup;
     _num_iterations  = config.num_iterations;
     _log_level       = config.log_level;
     _cooldown_sec    = config.cooldown_sec;
@@ -254,9 +255,19 @@ void Framework::log_info(const std::string &info)
     }
 }
 
+int Framework::num_warmup() const
+{
+    return _num_warmup;
+}
+
 int Framework::num_iterations() const
 {
     return _num_iterations;
+}
+
+void Framework::set_num_warmup(int num_warmup)
+{
+    _num_warmup = num_warmup;
 }
 
 void Framework::set_num_iterations(int num_iterations)
@@ -331,24 +342,20 @@ TestResult::Status Framework::run_test(const TestInfo &info, TestCaseFactory &te
 
             test_case->do_setup();
 
-            for(int i = 0; i < _num_iterations; ++i)
-            {
-                //Start the profiler if:
-                //- there is only one iteration
-                //- it's not the first iteration of a multi-iterations run.
-                //
-                //Reason: if the CLTuner is enabled then the first run will be really messy
-                //as each kernel will be executed several times, messing up the instruments like OpenCL timers.
-                if(_num_iterations == 1 || i != 0)
-                {
-                    profiler.start();
-                }
+            // Run some warmup iterations...
+            for(int i = 0; i < _num_warmup; ++i) {
                 test_case->do_run();
                 test_case->do_sync();
-                if(_num_iterations == 1 || i != 0)
-                {
-                    profiler.stop();
-                }
+            }
+
+            for(int i = 0; i < _num_iterations; ++i)
+            {
+                profiler.start();
+
+                test_case->do_run();
+                test_case->do_sync();
+
+                profiler.stop();
             }
 
             test_case->do_teardown();

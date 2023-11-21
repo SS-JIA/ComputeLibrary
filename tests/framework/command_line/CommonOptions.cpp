@@ -40,6 +40,7 @@ namespace framework
 CommonOptions::CommonOptions(CommandLineParser &parser)
     : help(parser.add_option<ToggleOption>("help")),
       instruments(),
+      warmup(parser.add_option<SimpleOption<int>>("warmup", 1)),
       iterations(parser.add_option<SimpleOption<int>>("iterations", 1)),
       log_format(),
       log_file(parser.add_option<SimpleOption<std::string>>("log-file")),
@@ -89,6 +90,7 @@ CommonOptions::CommonOptions(CommandLineParser &parser)
 
     help->set_help("Show this help message");
     instruments->set_help("Set the profiling instruments to use");
+    warmup->set_help("Number of warmup iterations per test case");
     iterations->set_help("Number of iterations per test case");
     log_format->set_help("Output format for measurements and failures (affects only log-file)");
     log_file->set_help("Write output to file instead of to the console (affected by log-format)");

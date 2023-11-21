@@ -73,6 +73,7 @@ public:
 
     arm_compute::utils::ToggleOption                           *help;           /**< Show help option */
     arm_compute::utils::EnumListOption<InstrumentsDescription> *instruments;    /**< Instruments option */
+    arm_compute::utils::SimpleOption<int>                      *warmup;         /**< Number of warmup option */
     arm_compute::utils::SimpleOption<int>                      *iterations;     /**< Number of iterations option */
     arm_compute::utils::EnumOption<LogFormat>                  *log_format;     /**< Log format option */
     arm_compute::utils::SimpleOption<std::string>              *log_file;       /**< Log file option */
